@@ -121,7 +121,7 @@ make shadow-mode
 
 ---
 
-## 📐 Deployment Phases
+##  Deployment Phases
 
 | Phase | What's Live | Success Criteria |
 |---|---|---|
@@ -132,7 +132,7 @@ make shadow-mode
 
 ---
 
-## 📖 Documentation
+##  Documentation
 
 - [`docs/architecture.md`](docs/architecture.md) — Full system design & ADRs
 - [`docs/agents.md`](docs/agents.md) — Per-agent design & observe→reason→signal loop
@@ -141,7 +141,7 @@ make shadow-mode
 
 ---
 
-## 🗺️ Roadmap
+##  Roadmap
 
 - [x] Project scaffold & environment setup
 - [ ] Kafka + PostgreSQL local infrastructure
@@ -157,7 +157,7 @@ make shadow-mode
 
 ---
 
-## 📄 License
+##  License
 
 MIT License — see [LICENSE](LICENSE)
 
