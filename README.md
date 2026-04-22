@@ -6,7 +6,7 @@ A production-grade, AI-powered Multi-Agent System (MAS) that autonomously **dete
 
 ---
 
-## 🚨 The Problem
+##  The Problem
 
 Silent failures are the most dangerous failures in data engineering. A pipeline completes successfully, no exception is raised, no alert fires — yet the data it produced is **wrong, incomplete, or corrupted**. Downstream consumers operate on bad data for hours, sometimes days.
 
@@ -14,7 +14,7 @@ Silent failures are the most dangerous failures in data engineering. A pipeline 
 
 ---
 
-## 🧠 The Solution
+##  The Solution
 
 A five-agent system where each agent owns a distinct observability domain, communicates through a shared event bus, and collaborates through a central orchestrator to build a **causal chain** — not just a symptom report.
 
@@ -49,7 +49,7 @@ A five-agent system where each agent owns a distinct observability domain, commu
 
 ---
 
-## 🏗️ Tech Stack
+##  Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -66,7 +66,7 @@ A five-agent system where each agent owns a distinct observability domain, commu
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 mas-pipeline-sentinel/
@@ -94,7 +94,7 @@ mas-pipeline-sentinel/
 
 ---
 
-## 🚀 Quickstart (Local)
+##  Quickstart (Local)
 
 ### Prerequisites
 - Docker & Docker Compose
