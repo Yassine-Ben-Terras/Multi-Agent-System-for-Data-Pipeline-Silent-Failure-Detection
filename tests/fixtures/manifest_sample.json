@@ -1,0 +1,125 @@
+{
+  "metadata": {
+    "dbt_schema_version": "https://schemas.getdbt.com/dbt/manifest/v11/manifest.json",
+    "dbt_version": "1.8.0",
+    "generated_at": "2026-04-22T03:00:00Z"
+  },
+  "nodes": {
+    "model.project.stg_orders": {
+      "unique_id": "model.project.stg_orders",
+      "name": "stg_orders",
+      "resource_type": "model",
+      "schema": "staging",
+      "database": "analytics",
+      "description": "Staged orders from source",
+      "tags": ["staging"],
+      "config": { "meta": {} }
+    },
+    "model.project.fct_orders": {
+      "unique_id": "model.project.fct_orders",
+      "name": "fct_orders",
+      "resource_type": "model",
+      "schema": "marts",
+      "database": "analytics",
+      "description": "Orders fact table",
+      "tags": ["finance", "core"],
+      "config": { "meta": { "owner": "data-platform" } }
+    },
+    "model.project.fct_revenue": {
+      "unique_id": "model.project.fct_revenue",
+      "name": "fct_revenue",
+      "resource_type": "model",
+      "schema": "marts",
+      "database": "analytics",
+      "description": "Revenue aggregations",
+      "tags": ["finance"],
+      "config": { "meta": {} }
+    },
+    "model.project.dim_customers": {
+      "unique_id": "model.project.dim_customers",
+      "name": "dim_customers",
+      "resource_type": "model",
+      "schema": "marts",
+      "database": "analytics",
+      "description": "Customer dimension",
+      "tags": [],
+      "config": { "meta": {} }
+    },
+    "model.project.rpt_weekly_sales": {
+      "unique_id": "model.project.rpt_weekly_sales",
+      "name": "rpt_weekly_sales",
+      "resource_type": "model",
+      "schema": "reports",
+      "database": "analytics",
+      "description": "Weekly sales report",
+      "tags": ["reporting"],
+      "config": { "meta": {} }
+    },
+    "test.project.not_null_fct_orders_id.abc": {
+      "unique_id": "test.project.not_null_fct_orders_id.abc",
+      "name": "not_null_fct_orders_id",
+      "resource_type": "test",
+      "schema": "marts",
+      "database": "analytics",
+      "description": "",
+      "tags": [],
+      "config": { "meta": {} }
+    }
+  },
+  "exposures": {
+    "exposure.project.executive_revenue_dashboard": {
+      "unique_id": "exposure.project.executive_revenue_dashboard",
+      "name": "executive_revenue_dashboard",
+      "type": "dashboard",
+      "description": "Executive revenue dashboard in Tableau",
+      "depends_on": {
+        "nodes": [
+          "model.project.fct_revenue",
+          "model.project.fct_orders"
+        ]
+      },
+      "owner": { "name": "data-platform" },
+      "url": "https://tableau.company.com/revenue",
+      "meta": { "sla": "daily_08:00_UTC" }
+    },
+    "exposure.project.churn_model_features": {
+      "unique_id": "exposure.project.churn_model_features",
+      "name": "churn_model_features",
+      "type": "ml",
+      "description": "Feature store for churn prediction model",
+      "depends_on": {
+        "nodes": [
+          "model.project.dim_customers",
+          "model.project.fct_orders"
+        ]
+      },
+      "owner": { "name": "ml-team" },
+      "url": null,
+      "meta": {}
+    }
+  },
+  "child_map": {
+    "model.project.stg_orders": [
+      "model.project.fct_orders",
+      "test.project.not_null_fct_orders_id.abc"
+    ],
+    "model.project.fct_orders": [
+      "model.project.fct_revenue",
+      "model.project.dim_customers"
+    ],
+    "model.project.fct_revenue": [
+      "model.project.rpt_weekly_sales"
+    ],
+    "model.project.dim_customers": [],
+    "model.project.rpt_weekly_sales": [],
+    "test.project.not_null_fct_orders_id.abc": []
+  },
+  "parent_map": {
+    "model.project.stg_orders": [],
+    "model.project.fct_orders": ["model.project.stg_orders"],
+    "model.project.fct_revenue": ["model.project.fct_orders"],
+    "model.project.dim_customers": ["model.project.fct_orders"],
+    "model.project.rpt_weekly_sales": ["model.project.fct_revenue"],
+    "test.project.not_null_fct_orders_id.abc": ["model.project.stg_orders"]
+  }
+}
