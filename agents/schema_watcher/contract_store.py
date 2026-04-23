@@ -19,11 +19,11 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, List, Optional
 
+
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
 
 logger = logging.getLogger(__name__)
-
 
 @dataclass
 class ColumnDef:
@@ -31,7 +31,6 @@ class ColumnDef:
     dtype: str
     nullable: bool
     criticality: str = "standard"   # critical | standard | low
-
 
 @dataclass
 class SchemaContract:
