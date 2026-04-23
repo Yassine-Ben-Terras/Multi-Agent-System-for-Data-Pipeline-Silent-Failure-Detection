@@ -5,7 +5,6 @@ Consumes from pipeline.signals.raw (all stages — schema can drift at any stage
 Produces to agents.anomalies and agents.heartbeats.
 """
 
-
 from __future__ import annotations
 
 import json
@@ -21,6 +20,7 @@ logger = logging.getLogger(__name__)
 TOPIC_RAW_SIGNALS = "pipeline.signals.raw"
 TOPIC_ANOMALIES   = "agents.anomalies"
 TOPIC_HEARTBEATS  = "agents.heartbeats"
+
 
 class SchemaSignalConsumer:
     """Consumes all stages from pipeline.signals.raw (schema can drift at ingestion or transformation)."""
@@ -53,6 +53,7 @@ class SchemaSignalConsumer:
 
     def close(self) -> None:
         self._consumer.close()
+
 
 class SchemaDriftProducer:
     """Produces schema drift anomalies and heartbeats."""

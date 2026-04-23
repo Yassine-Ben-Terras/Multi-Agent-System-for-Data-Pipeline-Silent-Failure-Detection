@@ -19,7 +19,6 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, List, Optional
 
-
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
 

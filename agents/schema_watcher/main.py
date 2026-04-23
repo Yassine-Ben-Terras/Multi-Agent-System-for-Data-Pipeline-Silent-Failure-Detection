@@ -22,11 +22,11 @@ import threading
 import time
 
 import structlog
+
 from config.schemas import AgentHeartbeat, AgentMode, PipelineSignal
 from agents.schema_watcher.contract_store import ColumnDef, ContractStore, SchemaContract
 from agents.schema_watcher.differ import SchemaDiffer
 from agents.schema_watcher.kafka_io import SchemaSignalConsumer, SchemaDriftProducer
-
 
 structlog.configure(
     processors=[
@@ -52,7 +52,6 @@ DB_URL = (
 AGENT_MODE      = AgentMode(os.getenv("AGENT_MODE", "shadow"))
 HEARTBEAT_INTERVAL = int(os.getenv("HEARTBEAT_INTERVAL_SECONDS", "60"))
 POLL_TIMEOUT    = 1.0
-
 
 
 class SchemaWatcherAgent:
@@ -84,7 +83,6 @@ class SchemaWatcherAgent:
 
     # ── Lifecycle ─────────────────────────────────────────────
 
-
     def start(self) -> None:
         self._running = True
         os_signal.signal(os_signal.SIGINT,  self._handle_shutdown)
@@ -103,7 +101,6 @@ class SchemaWatcherAgent:
         logger.info("agent_stopped", agent=self.AGENT_NAME)
 
     # ── Main loop ─────────────────────────────────────────────
-
 
     def _poll_loop(self) -> None:
         while self._running:
@@ -146,12 +143,10 @@ class SchemaWatcherAgent:
             )
             return
 
-
         # Hash match — no diff needed
         if contract.version_hash == snapshot.version_hash:
             logger.debug("schema_match", source=source, hash=snapshot.version_hash)
             return
-
 
         # Run the diff
         result = self._differ.diff(
@@ -182,7 +177,6 @@ class SchemaWatcherAgent:
         self._drifts_emitted += 1
 
     # ── Helpers ───────────────────────────────────────────────
-
 
     @staticmethod
     def _parse_snapshot(snapshot) -> list[ColumnDef]:
