@@ -6,7 +6,7 @@ A production-grade, AI-powered Multi-Agent System (MAS) that autonomously **dete
 
 ---
 
-##  The Problem
+## 🚨 The Problem
 
 Silent failures are the most dangerous failures in data engineering. A pipeline completes successfully, no exception is raised, no alert fires — yet the data it produced is **wrong, incomplete, or corrupted**. Downstream consumers operate on bad data for hours, sometimes days.
 
@@ -14,7 +14,7 @@ Silent failures are the most dangerous failures in data engineering. A pipeline 
 
 ---
 
-##  The Solution
+## 🧠 The Solution
 
 A five-agent system where each agent owns a distinct observability domain, communicates through a shared event bus, and collaborates through a central orchestrator to build a **causal chain** — not just a symptom report.
 
@@ -49,7 +49,7 @@ A five-agent system where each agent owns a distinct observability domain, commu
 
 ---
 
-##  Tech Stack
+## 🏗️ Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -66,7 +66,7 @@ A five-agent system where each agent owns a distinct observability domain, commu
 
 ---
 
-##  Project Structure
+## 📁 Project Structure
 
 ```
 mas-pipeline-sentinel/
@@ -94,7 +94,7 @@ mas-pipeline-sentinel/
 
 ---
 
-##  Quickstart (Local)
+## 🚀 Quickstart (Local)
 
 ### Prerequisites
 - Docker & Docker Compose
@@ -103,7 +103,7 @@ mas-pipeline-sentinel/
 
 ### 1. Clone & configure
 ```bash
-git clone https://github.com/Yassine-Ben-Terras/Multi-Agent-System-for-Data-Pipeline-Silent-Failure-Detection.git
+git clone https://github.com/YOUR_USERNAME/mas-pipeline-sentinel.git
 cd mas-pipeline-sentinel
 cp .env.example .env
 # Edit .env → add your ANTHROPIC_API_KEY
@@ -121,7 +121,7 @@ make shadow-mode
 
 ---
 
-##  Deployment Phases
+## 📐 Deployment Phases
 
 | Phase | What's Live | Success Criteria |
 |---|---|---|
@@ -132,7 +132,7 @@ make shadow-mode
 
 ---
 
-##  Documentation
+## 📖 Documentation
 
 - [`docs/architecture.md`](docs/architecture.md) — Full system design & ADRs
 - [`docs/agents.md`](docs/agents.md) — Per-agent design & observe→reason→signal loop
@@ -141,7 +141,7 @@ make shadow-mode
 
 ---
 
-##  Roadmap
+## 🗺️ Roadmap
 
 - [x] Project scaffold & environment setup
 - [ ] Kafka + PostgreSQL local infrastructure
@@ -157,7 +157,7 @@ make shadow-mode
 
 ---
 
-##  License
+## 📄 License
 
 MIT License — see [LICENSE](LICENSE)
 
