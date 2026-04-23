@@ -25,7 +25,6 @@ from agents.schema_watcher.contract_store import ColumnDef, SchemaContract
 
 logger = logging.getLogger(__name__)
 
-
 # ── Change types ──────────────────────────────────────────────
 
 class ChangeType:
@@ -221,10 +220,12 @@ class SchemaDiffer:
             return Severity.CRITICAL
         return base
 
+
     @staticmethod
     def _types_differ(a: str, b: str) -> bool:
         """Case-insensitive type comparison, strips whitespace."""
         return a.strip().upper() != b.strip().upper()
+
 
     @staticmethod
     def _highest_severity(changes: List[ColumnChange]) -> Severity:
