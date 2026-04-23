@@ -1,0 +1,82 @@
+{
+  "metadata": {
+    "dbt_schema_version": "https://schemas.getdbt.com/dbt/run-results/v4/run-results.json",
+    "dbt_version": "1.8.0",
+    "generated_at": "2026-04-22T03:14:00Z",
+    "invocation_id": "abc123-invocation"
+  },
+  "results": [
+    {
+      "unique_id": "test.project.not_null_fct_orders_order_id.a1b2c3",
+      "status": "pass",
+      "failures": 0,
+      "execution_time": 0.45,
+      "message": null,
+      "node": {
+        "name": "not_null_fct_orders_order_id",
+        "resource_type": "test",
+        "depends_on": { "nodes": ["model.project.fct_orders"] },
+        "test_metadata": {
+          "name": "not_null",
+          "kwargs": { "column_name": "order_id", "model": "ref('fct_orders')" }
+        },
+        "config": { "severity": "ERROR", "meta": {} }
+      }
+    },
+    {
+      "unique_id": "test.project.not_null_fct_orders_amount.d4e5f6",
+      "status": "fail",
+      "failures": 142,
+      "execution_time": 1.23,
+      "message": "Got 142 results, configured to fail if != 0",
+      "node": {
+        "name": "not_null_fct_orders_amount",
+        "resource_type": "test",
+        "depends_on": { "nodes": ["model.project.fct_orders"] },
+        "test_metadata": {
+          "name": "not_null",
+          "kwargs": { "column_name": "amount", "model": "ref('fct_orders')" }
+        },
+        "config": {
+          "severity": "ERROR",
+          "meta": {
+            "agent_severity": "critical",
+            "blast_radius": "executive_dashboard",
+            "oncall_team": "data-platform"
+          }
+        }
+      }
+    },
+    {
+      "unique_id": "test.project.unique_fct_revenue_revenue_id.g7h8i9",
+      "status": "fail",
+      "failures": 50000,
+      "execution_time": 2.10,
+      "message": "Got 50000 results, configured to fail if != 0",
+      "node": {
+        "name": "unique_fct_revenue_revenue_id",
+        "resource_type": "test",
+        "depends_on": { "nodes": ["model.project.fct_revenue"] },
+        "test_metadata": {
+          "name": "unique",
+          "kwargs": { "column_name": "revenue_id", "model": "ref('fct_revenue')" }
+        },
+        "config": { "severity": "ERROR", "meta": {} }
+      }
+    },
+    {
+      "unique_id": "model.project.fct_orders",
+      "status": "success",
+      "failures": null,
+      "execution_time": 12.5,
+      "message": null,
+      "node": {
+        "name": "fct_orders",
+        "resource_type": "model",
+        "depends_on": { "nodes": [] },
+        "test_metadata": {},
+        "config": { "meta": {} }
+      }
+    }
+  ]
+}
