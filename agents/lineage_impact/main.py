@@ -22,14 +22,12 @@ Usage:
 """
 
 from __future__ import annotations
-
 import logging
 import os
 import signal as os_signal
 import threading
 import time
 from typing import Optional
-
 import structlog
 
 from config.schemas import (
@@ -94,7 +92,7 @@ class LineageImpactAgent:
             dag_loaded=self._dag is not None,
         )
 
-    # ── Lifecycle ─────────────────────────────────────────────
+    # ── Lifecycle ──────────────────────────────────────────
 
     def start(self) -> None:
         self._running = True
@@ -114,7 +112,7 @@ class LineageImpactAgent:
         self._producer.flush()
         self._log_stats()
 
-    # ── Main loop ─────────────────────────────────────────────
+    # ── Main loop ──────────────────────────────────────────
 
     def _poll_loop(self) -> None:
         while self._running:
