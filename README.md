@@ -160,7 +160,7 @@ mas-pipeline-sentinel/
 ### 1. Clone and configure
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/mas-pipeline-sentinel.git
+git clone https://github.com/Yassine-Ben-Terras/Multi-Agent-System-for-Data-Pipeline-Silent-Failure-Detection.git
 cd mas-pipeline-sentinel
 cp .env.example .env
 # Edit .env → add ANTHROPIC_API_KEY (optional)
