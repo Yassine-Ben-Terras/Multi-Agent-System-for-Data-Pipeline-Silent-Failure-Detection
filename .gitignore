@@ -40,15 +40,18 @@ docker-compose.override.yml
 htmlcov/
 .tox/
 
+
 # Secrets & credentials
 *.pem
 *.key
 *.crt
 secrets/
 
+
 # Jupyter
 .ipynb_checkpoints/
 *.ipynb
+
 
 # Local overrides
 local_settings.py
