@@ -1,0 +1,120 @@
+# ─────────────────────────────────────────────────────────────
+# dbt Integration — Sample schema.yml
+#
+# Shows how to annotate dbt tests with MAS agent metadata.
+# The Quality Auditor reads the `meta` block to:
+#   - Set alert severity (agent_severity)
+#   - Identify which dashboard/ML feature is affected (blast_radius)
+#   - Route incidents to the right on-call team (oncall_team)
+#
+# Copy this pattern into your actual dbt project's schema.yml files.
+# ─────────────────────────────────────────────────────────────
+
+version: 2
+
+models:
+  - name: fct_orders
+    description: "Orders fact table — core revenue model"
+    columns:
+      - name: order_id
+        description: "Primary key — must be unique and non-null"
+        tests:
+          - not_null:
+              meta:
+                agent_severity: critical
+                blast_radius: executive_dashboard
+                oncall_team: data-platform
+          - unique:
+              meta:
+                agent_severity: critical
+                blast_radius: executive_dashboard
+                oncall_team: data-platform
+
+      - name: amount_usd
+        description: "Order value in USD"
+        tests:
+          - not_null:
+              meta:
+                agent_severity: critical
+                blast_radius: executive_dashboard
+                oncall_team: data-platform
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1000000
+              meta:
+                agent_severity: high
+                blast_radius: finance_weekly_report
+                oncall_team: data-platform
+
+      - name: status
+        description: "Order status"
+        tests:
+          - accepted_values:
+              values: ["pending", "confirmed", "shipped", "delivered", "cancelled"]
+              meta:
+                agent_severity: medium
+                oncall_team: data-platform
+
+      - name: created_at
+        tests:
+          - not_null:
+              meta:
+                agent_severity: high
+                oncall_team: data-platform
+
+  - name: fct_revenue
+    description: "Daily revenue aggregations"
+    columns:
+      - name: revenue_usd
+        tests:
+          - not_null:
+              meta:
+                agent_severity: critical
+                blast_radius: executive_dashboard
+                oncall_team: data-platform
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              meta:
+                agent_severity: critical
+                blast_radius: executive_dashboard
+                oncall_team: data-platform
+
+  - name: dim_customers
+    description: "Customer dimension table"
+    columns:
+      - name: customer_id
+        tests:
+          - not_null:
+              meta:
+                agent_severity: high
+                oncall_team: data-platform
+          - unique:
+              meta:
+                agent_severity: high
+                oncall_team: data-platform
+
+exposures:
+  - name: executive_revenue_dashboard
+    type: dashboard
+    description: "Executive revenue dashboard — daily refresh at 08:00 UTC"
+    owner:
+      name: Data Platform Team
+      email: data-platform@company.com
+    url: https://tableau.company.com/revenue
+    meta:
+      sla: "daily_08:00_UTC"
+    depends_on:
+      - ref('fct_revenue')
+      - ref('fct_orders')
+
+  - name: churn_model_features
+    type: ml
+    description: "Feature store for customer churn prediction model"
+    owner:
+      name: ML Team
+      email: ml-team@company.com
+    meta:
+      sla: "weekly_monday_06:00_UTC"
+    depends_on:
+      - ref('dim_customers')
+      - ref('fct_orders')
