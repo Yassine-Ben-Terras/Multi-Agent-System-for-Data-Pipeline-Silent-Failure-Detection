@@ -1,19 +1,54 @@
 version: "3.9"
 
 # ─────────────────────────────────────────────────────────────
-# MAS Pipeline Sentinel — Local Development Stack
+# MAS Pipeline Sentinel — Full Local Stack
 # ─────────────────────────────────────────────────────────────
+#
 # Services:
-#   kafka + zookeeper  → Message bus (agent communication)
-#   kafka-ui           → Kafka topic browser (port 8080)
-#   postgres           → Agent state store
-#   orchestrator       → Main orchestrator agent
-#   ingestion-monitor  → Ingestion anomaly agent
-#   schema-watcher     → Schema drift agent
-#   quality-auditor    → dbt test quality agent
-#   lineage-impact     → dbt DAG blast radius agent
-#   remediation        → Auto-remediation agent
+#   Infrastructure:
+#     zookeeper       → Kafka coordination
+#     kafka           → Message bus (all agent communication)
+#     kafka-ui        → Topic browser at http://localhost:8080
+#     postgres        → Agent state store
+#
+#   Agents (all start in shadow mode by default):
+#     orchestrator       → Signal correlation + LLM root cause
+#     ingestion-monitor  → Row count / checksum anomaly detection
+#     schema-watcher     → Schema contract drift detection
+#     quality-auditor    → dbt test failure analysis
+#     lineage-impact     → DAG blast radius computation
+#     remediation        → Quarantine / backfill / alerting
+#
+# Usage:
+#   make up                         → start full stack (shadow mode)
+#   AGENT_MODE=alert_only make up   → start in alert-only mode
+#   docker compose logs -f orchestrator
 # ─────────────────────────────────────────────────────────────
+
+x-agent-base: &agent-base
+  restart: unless-stopped
+  env_file: .env
+  networks:
+    - mas-net
+  depends_on:
+    kafka:
+      condition: service_healthy
+    postgres:
+      condition: service_healthy
+    kafka-init:
+      condition: service_completed_successfully
+
+x-agent-environment: &agent-environment
+  KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+  POSTGRES_HOST: postgres
+  POSTGRES_PORT: 5432
+  POSTGRES_DB: mas_sentinel
+  POSTGRES_USER: mas_user
+  POSTGRES_PASSWORD: changeme
+  DBT_ARTIFACTS_PATH: /app/dbt_integration/artifacts
+  HEARTBEAT_INTERVAL_SECONDS: 60
+  ANOMALY_ZSCORE_THRESHOLD: 2.5
+  ARTIFACT_POLL_INTERVAL_SECONDS: 30
 
 services:
 
@@ -22,6 +57,8 @@ services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.0
     container_name: mas_zookeeper
+    networks:
+      - mas-net
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -30,10 +67,13 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   kafka:
     image: confluentinc/cp-kafka:7.6.0
     container_name: mas_kafka
+    networks:
+      - mas-net
     depends_on:
       zookeeper:
         condition: service_healthy
@@ -47,15 +87,19 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG_RETENTION_HOURS: 168
     healthcheck:
       test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
       interval: 15s
       timeout: 10s
       retries: 5
+    restart: unless-stopped
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: mas_kafka_ui
+    networks:
+      - mas-net
     depends_on:
       - kafka
     ports:
@@ -63,10 +107,13 @@ services:
     environment:
       KAFKA_CLUSTERS_0_NAME: mas-local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+    restart: unless-stopped
 
   postgres:
     image: postgres:15-alpine
     container_name: mas_postgres
+    networks:
+      - mas-net
     ports:
       - "5432:5432"
     environment:
@@ -81,33 +128,151 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
+
+  # ── Topic initialiser (runs once then exits) ──────────────
+  kafka-init:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: mas_kafka_init
+    networks:
+      - mas-net
+    depends_on:
+      kafka:
+        condition: service_healthy
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        echo 'Creating MAS Kafka topics...'
+        kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists \
+          --topic pipeline.signals.raw --partitions 3 --replication-factor 1 \
+          --config retention.ms=86400000
+        kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists \
+          --topic agents.anomalies --partitions 3 --replication-factor 1 \
+          --config retention.ms=604800000
+        kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists \
+          --topic agents.confirmed_incidents --partitions 3 --replication-factor 1 \
+          --config retention.ms=2592000000
+        kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists \
+          --topic agents.actions_taken --partitions 3 --replication-factor 1 \
+          --config retention.ms=7776000000
+        kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists \
+          --topic agents.heartbeats --partitions 3 --replication-factor 1 \
+          --config retention.ms=3600000
+        echo 'All topics ready:'
+        kafka-topics --bootstrap-server kafka:29092 --list
+    restart: "no"
 
   # ── Agents ─────────────────────────────────────────────────
-  # Uncomment when each agent is implemented
 
-  # orchestrator:
-  #   build:
-  #     context: .
-  #     dockerfile: agents/orchestrator/Dockerfile
-  #   container_name: mas_orchestrator
-  #   depends_on:
-  #     kafka:
-  #       condition: service_healthy
-  #     postgres:
-  #       condition: service_healthy
-  #   env_file: .env
-  #   restart: unless-stopped
+  orchestrator:
+    <<: *agent-base
+    build:
+      context: .
+      dockerfile: agents/orchestrator/Dockerfile
+    container_name: mas_orchestrator
+    environment:
+      <<: *agent-environment
+      AGENT_MODE: ${AGENT_MODE:-shadow}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      LLM_MODEL_REASONING: ${LLM_MODEL_REASONING:-claude-sonnet-4-20250514}
+      LLM_MODEL_CLASSIFICATION: ${LLM_MODEL_CLASSIFICATION:-claude-haiku-4-5-20251001}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; socket.create_connection(('kafka', 29092), 2)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
 
-  # ingestion-monitor:
-  #   build:
-  #     context: .
-  #     dockerfile: agents/ingestion_monitor/Dockerfile
-  #   container_name: mas_ingestion_monitor
-  #   depends_on:
-  #     kafka:
-  #       condition: service_healthy
-  #   env_file: .env
-  #   restart: unless-stopped
+  ingestion-monitor:
+    <<: *agent-base
+    build:
+      context: .
+      dockerfile: agents/ingestion_monitor/Dockerfile
+    container_name: mas_ingestion_monitor
+    environment:
+      <<: *agent-environment
+      AGENT_MODE: ${AGENT_MODE:-shadow}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; socket.create_connection(('kafka', 29092), 2)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  schema-watcher:
+    <<: *agent-base
+    build:
+      context: .
+      dockerfile: agents/schema_watcher/Dockerfile
+    container_name: mas_schema_watcher
+    environment:
+      <<: *agent-environment
+      AGENT_MODE: ${AGENT_MODE:-shadow}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; socket.create_connection(('kafka', 29092), 2)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  quality-auditor:
+    <<: *agent-base
+    build:
+      context: .
+      dockerfile: agents/quality_auditor/Dockerfile
+    container_name: mas_quality_auditor
+    environment:
+      <<: *agent-environment
+      AGENT_MODE: ${AGENT_MODE:-shadow}
+    volumes:
+      - ./dbt_integration/artifacts:/app/dbt_integration/artifacts:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os; assert os.path.isdir('/app/dbt_integration/artifacts')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  lineage-impact:
+    <<: *agent-base
+    build:
+      context: .
+      dockerfile: agents/lineage_impact/Dockerfile
+    container_name: mas_lineage_impact
+    environment:
+      <<: *agent-environment
+      AGENT_MODE: ${AGENT_MODE:-shadow}
+    volumes:
+      - ./dbt_integration/artifacts:/app/dbt_integration/artifacts:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os; assert os.path.isdir('/app/dbt_integration/artifacts')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  remediation:
+    <<: *agent-base
+    build:
+      context: .
+      dockerfile: agents/remediation/Dockerfile
+    container_name: mas_remediation
+    environment:
+      <<: *agent-environment
+      AGENT_MODE: ${AGENT_MODE:-shadow}
+      REMEDIATION_DRY_RUN: ${REMEDIATION_DRY_RUN:-true}
+      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL:-}
+      PAGERDUTY_ROUTING_KEY: ${PAGERDUTY_ROUTING_KEY:-}
+      JIRA_BASE_URL: ${JIRA_BASE_URL:-}
+      JIRA_API_TOKEN: ${JIRA_API_TOKEN:-}
+      JIRA_EMAIL: ${JIRA_EMAIL:-}
+      AIRFLOW_BASE_URL: ${AIRFLOW_BASE_URL:-http://localhost:8082}
+      AIRFLOW_USER: ${AIRFLOW_USER:-airflow}
+      AIRFLOW_PASSWORD: ${AIRFLOW_PASSWORD:-airflow}
 
 volumes:
   postgres_data:
+
+networks:
+  mas-net:
+    driver: bridge
