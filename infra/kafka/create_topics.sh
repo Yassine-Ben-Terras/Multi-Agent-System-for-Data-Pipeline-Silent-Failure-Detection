@@ -10,11 +10,11 @@ REPLICATION=1
 PARTITIONS=3
 
 declare -A TOPICS_RETENTION=(
-    ["pipeline.signals.raw"]="86400000"       # 24h
-    ["agents.anomalies"]="604800000"           # 7 days
-    ["agents.confirmed_incidents"]="2592000000" # 30 days
-    ["agents.actions_taken"]="7776000000"      # 90 days
-    ["agents.heartbeats"]="3600000"            # 1h
+    ["pipeline.signals.raw"]="86400000"             # 24h
+    ["agents.anomalies"]="604800000"                # 7 days
+    ["agents.confirmed_incidents"]="2592000000"     # 30 days
+    ["agents.actions_taken"]="7776000000"           # 90 days
+    ["agents.heartbeats"]="3600000"                 # 1h
 )
 
 echo "Creating MAS Kafka topics on $BOOTSTRAP..."
