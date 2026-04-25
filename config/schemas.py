@@ -30,9 +30,9 @@ class Severity(str, Enum):
 
 
 class AgentMode(str, Enum):
-    SHADOW = "shadow"          # observe & log only
-    ALERT_ONLY = "alert_only"  # fire alerts, no actions
-    SUPERVISED = "supervised"  # auto on LOW, human on HIGH/CRITICAL
+    SHADOW = "shadow"               # observe & log only
+    ALERT_ONLY = "alert_only"       # fire alerts, no actions
+    SUPERVISED = "supervised"       # auto on LOW, human on HIGH/CRITICAL
     FULL_AUTONOMY = "full_autonomy"
 
 
