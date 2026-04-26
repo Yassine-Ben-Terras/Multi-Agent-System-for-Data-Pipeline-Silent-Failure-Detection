@@ -1,6 +1,4 @@
-# ─────────────────────────────────────────────
 # MAS Pipeline Sentinel — Python Dependencies
-# ─────────────────────────────────────────────
 
 # Agent Framework
 langgraph>=0.2.0
