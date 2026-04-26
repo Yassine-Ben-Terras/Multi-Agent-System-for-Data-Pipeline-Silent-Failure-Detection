@@ -1,4 +1,4 @@
-version: "3.9"
+
 
 # ─────────────────────────────────────────────────────────────
 # MAS Pipeline Sentinel — Full Local Stack
@@ -55,7 +55,7 @@ services:
   # ── Infrastructure ─────────────────────────────────────────
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.6.0
+    image: confluentinc/cp-zookeeper:7.3.0
     container_name: mas_zookeeper
     networks:
       - mas-net
@@ -70,7 +70,7 @@ services:
     restart: unless-stopped
 
   kafka:
-    image: confluentinc/cp-kafka:7.6.0
+    image: confluentinc/cp-kafka:7.3.0
     container_name: mas_kafka
     networks:
       - mas-net
@@ -110,7 +110,7 @@ services:
     restart: unless-stopped
 
   postgres:
-    image: postgres:15-alpine
+    image: postgres:15
     container_name: mas_postgres
     networks:
       - mas-net
@@ -132,7 +132,7 @@ services:
 
   # ── Topic initialiser (runs once then exits) ──────────────
   kafka-init:
-    image: confluentinc/cp-kafka:7.6.0
+    image: confluentinc/cp-kafka:7.3.0
     container_name: mas_kafka_init
     networks:
       - mas-net
