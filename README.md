@@ -6,11 +6,9 @@
 
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat&logo=python&logoColor=white)](https://python.org)
 [![LangGraph](https://img.shields.io/badge/LangGraph-0.2+-1C3C3C?style=flat)](https://github.com/langchain-ai/langgraph)
-[![Anthropic](https://img.shields.io/badge/Claude-Sonnet%204-D4A017?style=flat)](https://anthropic.com)
 [![Kafka](https://img.shields.io/badge/Apache%20Kafka-7.6-231F20?style=flat&logo=apachekafka&logoColor=white)](https://kafka.apache.org)
 [![dbt](https://img.shields.io/badge/dbt-1.8-FF694B?style=flat&logo=dbt&logoColor=white)](https://getdbt.com)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker&logoColor=white)](https://docker.com)
-[![Tests](https://img.shields.io/badge/Tests-188%20passing-2ECC71?style=flat)](tests/)
 [![License](https://img.shields.io/badge/License-MIT-lightgrey?style=flat)](LICENSE)
 
 *A production-grade AI-powered monitoring system that autonomously detects, diagnoses, and remediates silent failures across modern data pipelines — before they reach your dashboards.*
