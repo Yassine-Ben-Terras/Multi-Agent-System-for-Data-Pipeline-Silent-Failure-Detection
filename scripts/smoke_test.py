@@ -257,7 +257,7 @@ def run_smoke_test(bootstrap: str, scenario_name: str) -> int:
         print(f"    root_cause : {inc.get('root_cause')}")
         print(f"    severity   : {inc.get('severity')}")
         print(f"    signals    : {len(inc.get('correlated_signals', []))}")
-        print(f"    hypothesis : {inc.get('llm_hypothesis', 'none')[:100]}")
+        print(f"    hypothesis : {(inc.get('llm_hypothesis') or 'none')[:100]}")
     else:
         print("\n  ℹ no confirmed incidents (orchestrator may be in shadow mode)")
 
