@@ -11,7 +11,7 @@
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker&logoColor=white)](https://docker.com)
 [![License](https://img.shields.io/badge/License-MIT-lightgrey?style=flat)](LICENSE)
 
-*A production-grade AI-powered monitoring system that autonomously detects, diagnoses, and remediates silent failures across modern data pipelines — before they reach your dashboards.*
+*A production-grade AI-powered monitoring system that autonomously detects, diagnoses, and remediates silent failures across modern data pipelines ,before they reach your dashboards.*
 
 </div>
 
