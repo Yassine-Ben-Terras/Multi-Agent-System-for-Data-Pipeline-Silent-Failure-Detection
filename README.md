@@ -345,26 +345,6 @@ For full deployment guide see [`docs/architecture.md`](docs/architecture.md).
 
 ---
 
-## 🗺️ Roadmap
-
-- [x] Project scaffold & infrastructure
-- [x] Ingestion Monitor Agent (z-score, checksum, zero-row detection)
-- [x] Schema Watcher Agent (contract diff, severity escalation)
-- [x] Quality Auditor Agent (dbt integration, flakiness tracking)
-- [x] Lineage & Impact Agent (DAG traversal, blast radius)
-- [x] Orchestrator Agent (5-min window, correlation, Claude LLM)
-- [x] Remediation Agent (playbook, quarantine, backfill, alerting)
-- [x] Docker Compose full stack wiring
-- [x] dbt integration layer (artifact publisher, schema annotations)
-- [x] End-to-end smoke test (4 scenarios)
-- [ ] OpenTelemetry distributed tracing
-- [ ] Grafana observability dashboard
-- [ ] Feedback loop: alert rating → threshold auto-calibration
-- [ ] AWS production deployment (CDK/Terraform)
-- [ ] Integration tests (full Kafka + Postgres)
-
----
-
 ## 📄 License
 
 MIT License — see [LICENSE](LICENSE)
